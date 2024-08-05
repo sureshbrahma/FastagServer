@@ -34,7 +34,8 @@ dependencies:
   intl: ^0.17.0
   cupertino_icons: ^1.0.6
   shared_preferences: ^2.0.6
-
+  speech_to_text: any
+  flutter_tts: ^3.3.4
 
 dev_dependencies:
   flutter_test:

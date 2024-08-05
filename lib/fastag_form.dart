@@ -181,12 +181,11 @@ class _FastagFormState extends State<FastagForm> {
       'DepartmentInChargePermission': _departmentInChargePermission ,
       'RechargeAmount': _rechargeAmount,
       'DateOfRequest': _requestDate != null ? DateFormat('yyyy-MM-dd').format(_requestDate!) : '',
-
       'ReferenceNumber': referenceNumber,
     };
 
     // URL of your API endpoint
-    const url = 'http://192.168.73.220:88/api/values'; // Replace with your actual API URL
+    const url = 'https://bkaccanmol.bkapp.org/api/values'; // Replace with your actual API URL
 
     try {
       // Send the POST request

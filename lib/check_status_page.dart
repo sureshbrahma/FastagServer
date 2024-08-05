@@ -26,7 +26,7 @@ class _CheckStatusPageState extends State<CheckStatusPage> {
 
   Future<void> _fetchApiData() async {
     try {
-      final response = await http.get(Uri.parse('http://192.168.73.220:88/api/values'));
+      final response = await http.get(Uri.parse('https://bkaccanmol.bkapp.org/api/values'));
 
       if (response.statusCode == 200) {
         List<Map<String, String>> apiData = [];

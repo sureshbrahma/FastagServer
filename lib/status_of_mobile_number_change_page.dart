@@ -58,7 +58,7 @@ class _StatusOfMobileNumberChangePageState
     }
 
     try {
-      const url = 'http://192.168.73.220:88/api/change'; // Replace with your API URL
+      const url = 'https://bkaccanmol.bkapp.org/api/change'; // Replace with your API URL
       final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
