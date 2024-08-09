@@ -36,6 +36,7 @@ dependencies:
   shared_preferences: ^2.0.6
   speech_to_text: any
   flutter_tts: ^3.3.4
+  connectivity_plus: ^3.0.0
 
 dev_dependencies:
   flutter_test:

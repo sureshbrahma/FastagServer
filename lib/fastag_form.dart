@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class FastagForm extends StatefulWidget {
   const FastagForm({super.key});
@@ -169,7 +170,17 @@ class _FastagFormState extends State<FastagForm> {
 
   void _sendDataToServer(final referenceNumber) async {
     // Prepare the form data
+    var connectivityResult = await (Connectivity().checkConnectivity());
 
+    if (connectivityResult == ConnectivityResult.none) {
+      // No internet connection
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No internet connection. Please check your connection and try again.'),
+        ),
+      );
+      return;
+    }
     final formData = {
       'InstitutionName': _selectedInstitution,
       'DepartmentName': _department,

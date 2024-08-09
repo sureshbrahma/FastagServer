@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -93,6 +94,17 @@ class _ChangeMobileNumberPageState extends State<ChangeMobileNumberPage> {
 
 
   void _sendDataToServer() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+
+    if (connectivityResult == ConnectivityResult.none) {
+      // No internet connection
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No internet connection. Please check your connection and try again.'),
+        ),
+      );
+      return;
+    }
     final formData = {
       'VehicleNumber': _vehicleNumberController.text,
       'OldMobileNumber': _oldMobileNumberController.text,
