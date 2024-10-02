@@ -175,7 +175,7 @@ class _FastagFormState extends State<FastagForm> {
     if (connectivityResult == ConnectivityResult.none) {
       // No internet connection
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('No internet connection. Please check your connection and try again.'),
         ),
       );

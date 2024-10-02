@@ -45,7 +45,7 @@ class WelcomePage extends StatelessWidget {
                   ),
                   const SizedBox(height: 24.0),
                   Image.asset(
-                    'assets/welcome_image.jpg', // Update with your image asset
+                    'assets/wl.jpg', // Update with your image asset
                     height: 100.0,
                   ),
                   const SizedBox(height: 16.0),
@@ -68,7 +68,7 @@ class WelcomePage extends StatelessWidget {
                     },
                     child: const Text('Check Status of Fastag Recharge'),
                   ),
-                  const SizedBox(height: 16.0),
+                 /* const SizedBox(height: 16.0),
                   ElevatedButton(
                     onPressed: () {
                       Navigator.push(
@@ -87,7 +87,7 @@ class WelcomePage extends StatelessWidget {
                       );
                     },
                     child: const Text('Status of Mobile Number Change'),
-                  ),
+                  ),*/
                   const SizedBox(height: 16.0),
                   ElevatedButton(
                     onPressed: () {
