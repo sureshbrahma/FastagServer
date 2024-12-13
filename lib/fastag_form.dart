@@ -1,8 +1,11 @@
+import 'package:BKFASTAG/welcome_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:upgrader/upgrader.dart';
 
 class FastagForm extends StatefulWidget {
   const FastagForm({super.key});
@@ -84,7 +87,8 @@ class _FastagFormState extends State<FastagForm> {
       FocusScope.of(context).requestFocus(_vehicleNumberFocusNode);
       return;
     } else if (!RegExp(r'^[A-Za-z0-9]+$').hasMatch(_vehicleNumber!)) {
-      _showSnackbar('Vehicle number should not contain spaces or special characters');
+      _showSnackbar(
+          'Vehicle number should not contain spaces or special characters');
       FocusScope.of(context).requestFocus(_vehicleNumberFocusNode);
       return;
     }
@@ -103,7 +107,8 @@ class _FastagFormState extends State<FastagForm> {
     if (_departmentInChargePermission == null ||
         _departmentInChargePermission!.trim().isEmpty) {
       _showSnackbar('Please enter the permission details');
-      FocusScope.of(context).requestFocus(_departmentInChargePermissionFocusNode);
+      FocusScope.of(context)
+          .requestFocus(_departmentInChargePermissionFocusNode);
       return;
     }
     if (_rechargeAmount == null || _rechargeAmount!.trim().isEmpty) {
@@ -136,7 +141,7 @@ class _FastagFormState extends State<FastagForm> {
         'Permission: $_departmentInChargePermission\n'
         'Recharge Amount: $_rechargeAmount\n'
         'Request Date: ${_requestDate != null ? DateFormat('dd-MM-yyyy').format(_requestDate!) : ''}';
-        final referenceNumber = _generateReferenceNumber();
+    final referenceNumber = _generateReferenceNumber();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -163,6 +168,7 @@ class _FastagFormState extends State<FastagForm> {
       },
     );
   }
+
   String _generateReferenceNumber() {
     final now = DateTime.now();
     return 'REF-${now.year}${now.month}${now.day}${now.hour}${now.minute}${now.second}';
@@ -176,7 +182,8 @@ class _FastagFormState extends State<FastagForm> {
       // No internet connection
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('No internet connection. Please check your connection and try again.'),
+          content: Text(
+              'No internet connection. Please check your connection and try again.'),
         ),
       );
       return;
@@ -189,14 +196,17 @@ class _FastagFormState extends State<FastagForm> {
       'VehicleFullNumber': _vehicleNumber,
       'VehicleType': _vehicleType,
       'TravellingFromTo': _travelFromTo,
-      'DepartmentInChargePermission': _departmentInChargePermission ,
+      'DepartmentInChargePermission': _departmentInChargePermission,
       'RechargeAmount': _rechargeAmount,
-      'DateOfRequest': _requestDate != null ? DateFormat('yyyy-MM-dd').format(_requestDate!) : '',
+      'DateOfRequest': _requestDate != null
+          ? DateFormat('yyyy-MM-dd').format(_requestDate!)
+          : '',
       'ReferenceNumber': referenceNumber,
     };
 
     // URL of your API endpoint
-    const url = 'https://bkaccanmol.bkapp.org/api/values'; // Replace with your actual API URL
+    const url =
+        'https://bkaccanmol.bkapp.org/api/values'; // Replace with your actual API URL
 
     try {
       // Send the POST request
@@ -213,14 +223,57 @@ class _FastagFormState extends State<FastagForm> {
         showDialog(
           context: context,
           builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Success'),
-              content: Text('Your request for Fastag Recharge submitted successfully.\n Your Request  Reference Number is: $referenceNumber \n Please Check Status of your Request With in Three Days.After 3 days status will be Expired'),
+            return  AlertDialog(
+              title: Row(
+                children: [
+                  Text(
+                    '✌️', // Victory hand emoji
+                    style: TextStyle(fontSize: 24), // Adjust size as needed
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Success',
+                    style: TextStyle(color: Colors.blue), // Blue color for Success title
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '😄', // Wide grin emoji
+                    style: TextStyle(fontSize: 24), // Joyful expression
+                  ),
+                ],
+              ),
+              content:  Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Your request for Fastag Recharge submitted successfully.\n'
+                        'Your Request Reference Number is: $referenceNumber',
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'RECHARGE WILL BE DONE WITHIN 24 HOURS',
+                    style: const TextStyle(
+                      color: Colors.red, // Red color for this specific text
+                      fontWeight: FontWeight.bold, // Bold text
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Please Check Status of your Request Within Three Days. After 3 days, status will be Expired.',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ],
+              ),
               actions: [
                 TextButton(
                   child: const Text('OK'),
                   onPressed: () {
                     Navigator.of(context).pop();
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const WelcomePage()),
+                    );
                     // Navigate to welcome page or any other page after successful submission
                   },
                 ),
@@ -233,16 +286,13 @@ class _FastagFormState extends State<FastagForm> {
         throw Exception('Failed to submit data');
       }
     } catch (error) {
-
-          ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error submitting form: $error'),
         ),
       );
     }
   }
-
-
 
   @override
   void dispose() {
@@ -261,259 +311,303 @@ class _FastagFormState extends State<FastagForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('FASTAG Recharges Requisition Form'),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Container(
-            padding: const EdgeInsets.all(20.0),
-            decoration: BoxDecoration(
-              color: Colors.cyan,
-              borderRadius: BorderRadius.circular(10.0),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black26,
-                  offset: Offset(0, 2),
-                  blurRadius: 4.0,
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'FASTAG Recharges Requisition Form',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red,
-                    backgroundColor: Colors.white,
+    return UpgradeAlert(
+      dialogStyle: UpgradeDialogStyle.cupertino,
+      showIgnore: false,
+      showLater: false  ,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('FASTAG Recharges Requisition Form'),
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Container(
+              padding: const EdgeInsets.all(20.0),
+              decoration: BoxDecoration(
+                color: Colors.cyan,
+                borderRadius: BorderRadius.circular(10.0),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black26,
+                    offset: Offset(0, 2),
+                    blurRadius: 4.0,
                   ),
-                ),
-                const SizedBox(height: 16.0),
-                const Text('Name of Institution (Only for BK & WRST Vehicles, Not for RERF)',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                DropdownButtonFormField<String>(
-                  value: _selectedInstitution,
-                  focusNode: _institutionFocusNode,
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'Please select an institution',
-                      child: Text('Please select an institution'),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'FASTAG Recharges Requisition Form',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                      backgroundColor: Colors.white,
                     ),
-                    DropdownMenuItem(
-                      value: 'BRAHMAKUMARIS',
-                      child: Text('BRAHMAKUMARIS'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'W.R.S.T.',
-                      child: Text('W.R.S.T.'),
-                    ),
-                  ],
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedInstitution = value;
-                    });
-                  },
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    filled: true,
-                    fillColor: Colors.white,
                   ),
-                ),
-                const SizedBox(height: 16.0),
-                const Text('Name of Department',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                TextFormField(
-                  focusNode: _departmentFocusNode,
-                  onChanged: (value) {
-                    setState(() {
-                      _department = value;
-                    });
-                  },
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'Enter department name',
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 16.0),
-                const Text('User Name', style: TextStyle(fontWeight: FontWeight.bold)),
-                TextFormField(
-                  focusNode: _userNameFocusNode,
-                  onChanged: (value) {
-                    setState(() {
-                      _userName = value;
-                    });
-                  },
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'Enter user name',
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 16.0),
-                const Text('WhatsApp Number',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                TextFormField(
-                  focusNode: _whatsappNumberFocusNode,
-                  onChanged: (value) {
-                    setState(() {
-                      _whatsappNumber = value;
-                    });
-                  },
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'Enter WhatsApp number',
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 16.0),
-                const Text('Vehicle Number',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                TextFormField(
-                  focusNode: _vehicleNumberFocusNode,
-                  onChanged: (value) {
-                    setState(() {
-                      _vehicleNumber = value;
-                    });
-                  },
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'Enter vehicle number',
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 16.0),
-                const Text('Vehicle Type', style: TextStyle(fontWeight: FontWeight.bold)),
-                DropdownButtonFormField<String>(
-                  value: _vehicleType,
-                  focusNode: _vehicleTypeFocusNode,
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'Please select vehicle type',
-                      child: Text('Please select vehicle type'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Car',
-                      child: Text('Car'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Bus',
-                      child: Text('Bus'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Truck',
-                      child: Text('Truck'),
-                    ),
-                  ],
-                  onChanged: (value) {
-                    setState(() {
-                      _vehicleType = value;
-                    });
-                  },
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 16.0),
-                const Text('Travel From - To', style: TextStyle(fontWeight: FontWeight.bold)),
-                TextFormField(
-                  focusNode: _travelFromToFocusNode,
-                  onChanged: (value) {
-                    setState(() {
-                      _travelFromTo = value;
-                    });
-                  },
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'Enter travel details',
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 16.0),
-                const Text('Department In-Charge Permission',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                TextFormField(
-                  focusNode: _departmentInChargePermissionFocusNode,
-                  onChanged: (value) {
-                    setState(() {
-                      _departmentInChargePermission = value;
-                    });
-                  },
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'Enter permission details',
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 16.0),
-                const Text('Recharge Amount (in INR)',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                TextFormField(
-                  focusNode: _rechargeAmountFocusNode,
-                  keyboardType: TextInputType.number,
-                  onChanged: (value) {
-                    setState(() {
-                      _rechargeAmount = value;
-                    });
-                  },
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'Enter recharge amount',
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 16.0),
-                const Text('Request Date', style: TextStyle(fontWeight: FontWeight.bold)),
-                InkWell(
-                  onTap: () {
-                    _selectDate(context);
-                  },
-                  child: InputDecorator(
+                  const SizedBox(height: 16.0),
+                  const Text(
+                      'Name of Institution (Only for BK & WRST Vehicles, Not for RERF)',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  DropdownButtonFormField<String>(
+                    value: _selectedInstitution,
+                    focusNode: _institutionFocusNode,
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'Please select an institution',
+                        child: Text('Please select an institution'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'BRAHMAKUMARIS',
+                        child: Text('BRAHMAKUMARIS'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'W.R.S.T.',
+                        child: Text('W.R.S.T.'),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedInstitution = value;
+                      });
+                    },
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       filled: true,
                       fillColor: Colors.white,
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          _requestDate == null
-                              ? 'Select request date'
-                              : DateFormat('dd-MM-yyyy').format(_requestDate!),
-                        ),
-                        const Icon(Icons.calendar_today),
-                      ],
+                  ),
+                  const SizedBox(height: 16.0),
+                  const Text('Name of Department',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  TextFormField(
+                    focusNode: _departmentFocusNode,
+                    onChanged: (value) {
+                      setState(() {
+                        _department = value.toUpperCase();
+                      });
+                    },
+                    inputFormatters: [
+                      // Ensures all entered text is in uppercase
+                      TextInputFormatter.withFunction(
+                            (oldValue, newValue) =>
+                            TextEditingValue(text: newValue.text.toUpperCase(), selection: newValue.selection),
+                      ),
+                    ],
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: 'Enter department name',
+                      filled: true,
+                      fillColor: Colors.white,
                     ),
                   ),
-                ),
-                const SizedBox(height: 24.0),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        _validateForm();
-                      }
+                  const SizedBox(height: 16.0),
+                  const Text('User Name',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  TextFormField(
+                    focusNode: _userNameFocusNode,
+                    onChanged: (value) {
+                      setState(() {
+                        _userName = value.toUpperCase();
+                      });
                     },
-                    child: const Text('Submit'),
+                    inputFormatters: [
+                      // Ensures all entered text is in uppercase
+                      TextInputFormatter.withFunction(
+                            (oldValue, newValue) =>
+                            TextEditingValue(text: newValue.text.toUpperCase(), selection: newValue.selection),
+                      ),
+                    ],
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: 'Enter user name',
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 16.0),
+                  const Text('WhatsApp Number',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  TextFormField(
+                    focusNode: _whatsappNumberFocusNode,
+                    onChanged: (value) {
+                      setState(() {
+                        _whatsappNumber = value;
+                      });
+                    },
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: 'Enter WhatsApp number',
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                  const Text('Vehicle Number',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  TextFormField(
+                    focusNode: _vehicleNumberFocusNode,
+                    onChanged: (value) {
+                      setState(() {
+                        _vehicleNumber = value.toUpperCase();
+                      });
+                    },
+                    inputFormatters: [
+                      // Ensures all entered text is in uppercase
+                      TextInputFormatter.withFunction(
+                            (oldValue, newValue) =>
+                            TextEditingValue(text: newValue.text.toUpperCase(), selection: newValue.selection),
+                      ),
+                    ],
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: 'Enter your vehicle number',
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),),
+                  const SizedBox(height: 16.0),
+                  const Text('Vehicle Type',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  DropdownButtonFormField<String>(
+                    value: _vehicleType,
+                    focusNode: _vehicleTypeFocusNode,
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'Please select vehicle type',
+                        child: Text('Please select vehicle type'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'CAR',
+                        child: Text('CAR'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'BUS',
+                        child: Text('BUS'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'TRUCK',
+                        child: Text('TRUCK'),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        _vehicleType = value;
+                      });
+                    },
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                  const Text('Travel From - To',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  TextFormField(
+                    focusNode: _travelFromToFocusNode,
+                    onChanged: (value) {
+                      setState(() {
+                        _travelFromTo = value.toUpperCase();
+                      });
+                    },
+                    inputFormatters: [
+                      // Ensures all entered text is in uppercase
+                      TextInputFormatter.withFunction(
+                            (oldValue, newValue) =>
+                            TextEditingValue(text: newValue.text.toUpperCase(), selection: newValue.selection),
+                      ),
+                    ],
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: 'Enter travel details',
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                  const Text('Department In-Charge Permission',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  TextFormField(
+                    focusNode: _departmentInChargePermissionFocusNode,
+                    onChanged: (value) {
+                      setState(() {
+                        _departmentInChargePermission = value.toUpperCase();
+                      });
+                    },
+                    inputFormatters: [
+                      // Ensures all entered text is in uppercase
+                      TextInputFormatter.withFunction(
+                            (oldValue, newValue) =>
+                            TextEditingValue(text: newValue.text.toUpperCase(), selection: newValue.selection),
+                      ),
+                    ],
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: 'Enter permission details',
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                  const Text('Recharge Amount (in INR)',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  TextFormField(
+                    focusNode: _rechargeAmountFocusNode,
+                    keyboardType: TextInputType.number,
+                    onChanged: (value) {
+                      setState(() {
+                        _rechargeAmount = value;
+                      });
+                    },
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: 'Enter recharge amount',
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                  const Text('Request Date',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  InkWell(
+                    onTap: () {
+                      _selectDate(context);
+                    },
+                    child: InputDecorator(
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            _requestDate == null
+                                ? 'Select request date'
+                                : DateFormat('dd-MM-yyyy').format(_requestDate!),
+                          ),
+                          const Icon(Icons.calendar_today),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24.0),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          _validateForm();
+                        }
+                      },
+                      child: const Text('Submit'),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

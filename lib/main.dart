@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'welcome_page.dart'; // Update this import based on the file's location
+import 'package:upgrader/upgrader.dart';
 
-void main() {
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Upgrader.clearSavedSettings();
   runApp(const MyApp());
 }
 
@@ -17,7 +21,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.deepPurple),
       ),
-      home: const AuthCheck(), // Check the authentication state on startup
+      home: const AuthCheck(),
+      // Check the authentication state on startup
     );
   }
 }
