@@ -38,6 +38,7 @@ class _FastagFormState extends State<FastagForm> {
   final _departmentInChargePermissionFocusNode = FocusNode();
   final _rechargeAmountFocusNode = FocusNode();
   final _requestDateFocusNode = FocusNode();
+  final TextEditingController _vehicleNumberController = TextEditingController();
 
   void _showSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -59,7 +60,22 @@ class _FastagFormState extends State<FastagForm> {
     }
   }
 
-  void _validateForm() {
+  @override
+  void initState() {
+    super.initState();
+    _vehicleNumberController.addListener(() {
+      _validateVehicleNumber(_vehicleNumberController.text);
+    });
+  }
+
+  void _validateVehicleNumber(String input) {
+    if (input.contains(RegExp(r'[^A-Za-z0-9]'))) {
+      _showSnackbar(
+          'Vehicle number should not contain spaces or special characters');
+    }
+  }
+
+  void _validateForm() async {
     if (_selectedInstitution == null ||
         _selectedInstitution!.trim().isEmpty ||
         _selectedInstitution == 'Please select an institution') {
@@ -127,20 +143,34 @@ class _FastagFormState extends State<FastagForm> {
       FocusScope.of(context).requestFocus(_requestDateFocusNode);
       return;
     }
+
+    if (_vehicleNumber != null && _vehicleNumber!.isNotEmpty) {
+      Map<String, dynamic> vehicleData = await _checkVehicleNumberAndExpiration(
+          _vehicleNumber!);
+      if (vehicleData['VehicleFullNumber'] != '') { // Vehicle exists
+        if (vehicleData['Expiration'] == 'NO') {
+          _showSnackbar(
+              'Error: Request already exists for this vehicle number');
+          return;
+        }
+      }
+    }
+
     _showPreviewDialog();
   }
 
   void _showPreviewDialog() {
-    String message = 'Institution: $_selectedInstitution\n'
-        'Department: $_department\n'
-        'User Name: $_userName\n'
-        'WhatsApp Number: $_whatsappNumber\n'
-        'Vehicle Number: $_vehicleNumber\n'
-        'Vehicle Type: $_vehicleType\n'
-        'Travel From-To: $_travelFromTo\n'
-        'Permission: $_departmentInChargePermission\n'
-        'Recharge Amount: $_rechargeAmount\n'
-        'Request Date: ${_requestDate != null ? DateFormat('dd-MM-yyyy').format(_requestDate!) : ''}';
+    String message = 'INSTITUTION: ${_selectedInstitution?.toUpperCase()}\n'
+        'DEPARTMENT: ${_department?.toUpperCase()}\n'
+        'USER NAME: ${_userName?.toUpperCase()}\n'
+        'WHATSAPP NUMBER: ${_whatsappNumber?.toUpperCase()}\n'
+        'VEHICLE NUMBER: ${_vehicleNumber?.toUpperCase()}\n'
+        'VEHICLE TYPE: ${_vehicleType?.toUpperCase()}\n'
+        'TRAVEL FROM-TO: ${_travelFromTo?.toUpperCase()}\n'
+        'PERMISSION: ${_departmentInChargePermission?.toUpperCase()}\n'
+        'RECHARGE AMOUNT: ${_rechargeAmount?.toUpperCase()}\n'
+        'REQUEST DATE: ${_requestDate != null ? DateFormat('dd-MM-yyyy').format(
+        _requestDate!).toUpperCase() : ''}';
     final referenceNumber = _generateReferenceNumber();
     showDialog(
       context: context,
@@ -159,7 +189,6 @@ class _FastagFormState extends State<FastagForm> {
               child: const Text('Confirm'),
               onPressed: () {
                 Navigator.of(context).pop();
-
                 _sendDataToServer(referenceNumber);
               },
             ),
@@ -171,11 +200,11 @@ class _FastagFormState extends State<FastagForm> {
 
   String _generateReferenceNumber() {
     final now = DateTime.now();
-    return 'REF-${now.year}${now.month}${now.day}${now.hour}${now.minute}${now.second}';
+    return 'REF-${now.year}${now.month}${now.day}${now.hour}${now.minute}${now
+        .second}';
   }
 
   void _sendDataToServer(final referenceNumber) async {
-    // Prepare the form data
     var connectivityResult = await (Connectivity().checkConnectivity());
 
     if (connectivityResult == ConnectivityResult.none) {
@@ -188,6 +217,7 @@ class _FastagFormState extends State<FastagForm> {
       );
       return;
     }
+
     final formData = {
       'InstitutionName': _selectedInstitution,
       'DepartmentName': _department,
@@ -204,9 +234,7 @@ class _FastagFormState extends State<FastagForm> {
       'ReferenceNumber': referenceNumber,
     };
 
-    // URL of your API endpoint
-    const url =
-        'https://bkaccanmol.bkapp.org/api/values'; // Replace with your actual API URL
+    const url = 'https://bkaccanmol.bkapp.org/api/values'; // Replace with your actual API URL
 
     try {
       // Send the POST request
@@ -223,26 +251,26 @@ class _FastagFormState extends State<FastagForm> {
         showDialog(
           context: context,
           builder: (BuildContext context) {
-            return  AlertDialog(
+            return AlertDialog(
               title: Row(
                 children: [
                   Text(
                     '✌️', // Victory hand emoji
-                    style: TextStyle(fontSize: 24), // Adjust size as needed
+                    style: TextStyle(fontSize: 24),
                   ),
                   const SizedBox(width: 8),
                   const Text(
                     'Success',
-                    style: TextStyle(color: Colors.blue), // Blue color for Success title
+                    style: TextStyle(color: Colors.blue),
                   ),
                   const SizedBox(width: 8),
                   Text(
                     '😄', // Wide grin emoji
-                    style: TextStyle(fontSize: 24), // Joyful expression
+                    style: TextStyle(fontSize: 24),
                   ),
                 ],
               ),
-              content:  Column(
+              content: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -254,8 +282,8 @@ class _FastagFormState extends State<FastagForm> {
                   Text(
                     'RECHARGE WILL BE DONE WITHIN 24 HOURS',
                     style: const TextStyle(
-                      color: Colors.red, // Red color for this specific text
-                      fontWeight: FontWeight.bold, // Bold text
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -272,9 +300,9 @@ class _FastagFormState extends State<FastagForm> {
                     Navigator.of(context).pop();
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => const WelcomePage()),
+                      MaterialPageRoute(
+                          builder: (context) => const WelcomePage()),
                     );
-                    // Navigate to welcome page or any other page after successful submission
                   },
                 ),
               ],
@@ -294,8 +322,40 @@ class _FastagFormState extends State<FastagForm> {
     }
   }
 
+  Future<Map<String, dynamic>> _checkVehicleNumberAndExpiration(
+      String vehicleNumber) async {
+    final response = await http.get(
+        Uri.parse('https://bkaccanmol.bkapp.org/api/values'));
+
+    if (response.statusCode == 200) {
+      // Decode the JSON response
+      List<dynamic> allRecords = json.decode(response.body);
+
+      // Find the record matching the vehicle number
+      var record = allRecords.firstWhere(
+              (element) =>
+          element['VehicleFullNumber']
+              ?.toString()
+              .toUpperCase() == vehicleNumber.toUpperCase(),
+          orElse: () => null
+      );
+
+      if (record != null) {
+        return {
+          'VehicleFullNumber': record['VehicleFullNumber'] ?? '',
+          'Expiration': record['Expiration'] ?? 'UNKNOWN'
+        };
+      } else {
+        return {'VehicleFullNumber': '', 'Expiration': 'NOT_FOUND'};
+      }
+    } else {
+      throw Exception('Failed to load vehicle data');
+    }
+  }
+
   @override
   void dispose() {
+    _vehicleNumberController.dispose();
     _institutionFocusNode.dispose();
     _departmentFocusNode.dispose();
     _userNameFocusNode.dispose();
@@ -314,7 +374,7 @@ class _FastagFormState extends State<FastagForm> {
     return UpgradeAlert(
       dialogStyle: UpgradeDialogStyle.cupertino,
       showIgnore: false,
-      showLater: false  ,
+      showLater: false,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('FASTAG Recharges Requisition Form'),
@@ -391,10 +451,10 @@ class _FastagFormState extends State<FastagForm> {
                       });
                     },
                     inputFormatters: [
-                      // Ensures all entered text is in uppercase
                       TextInputFormatter.withFunction(
                             (oldValue, newValue) =>
-                            TextEditingValue(text: newValue.text.toUpperCase(), selection: newValue.selection),
+                            TextEditingValue(text: newValue.text.toUpperCase(),
+                                selection: newValue.selection),
                       ),
                     ],
                     decoration: const InputDecoration(
@@ -415,10 +475,10 @@ class _FastagFormState extends State<FastagForm> {
                       });
                     },
                     inputFormatters: [
-                      // Ensures all entered text is in uppercase
                       TextInputFormatter.withFunction(
                             (oldValue, newValue) =>
-                            TextEditingValue(text: newValue.text.toUpperCase(), selection: newValue.selection),
+                            TextEditingValue(text: newValue.text.toUpperCase(),
+                                selection: newValue.selection),
                       ),
                     ],
                     decoration: const InputDecoration(
@@ -449,6 +509,7 @@ class _FastagFormState extends State<FastagForm> {
                   const Text('Vehicle Number',
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   TextFormField(
+                    controller: _vehicleNumberController,
                     focusNode: _vehicleNumberFocusNode,
                     onChanged: (value) {
                       setState(() {
@@ -456,10 +517,10 @@ class _FastagFormState extends State<FastagForm> {
                       });
                     },
                     inputFormatters: [
-                      // Ensures all entered text is in uppercase
                       TextInputFormatter.withFunction(
                             (oldValue, newValue) =>
-                            TextEditingValue(text: newValue.text.toUpperCase(), selection: newValue.selection),
+                            TextEditingValue(text: newValue.text.toUpperCase(),
+                                selection: newValue.selection),
                       ),
                     ],
                     decoration: const InputDecoration(
@@ -467,7 +528,8 @@ class _FastagFormState extends State<FastagForm> {
                       hintText: 'Enter your vehicle number',
                       filled: true,
                       fillColor: Colors.white,
-                    ),),
+                    ),
+                  ),
                   const SizedBox(height: 16.0),
                   const Text('Vehicle Type',
                       style: TextStyle(fontWeight: FontWeight.bold)),
@@ -514,10 +576,10 @@ class _FastagFormState extends State<FastagForm> {
                       });
                     },
                     inputFormatters: [
-                      // Ensures all entered text is in uppercase
                       TextInputFormatter.withFunction(
                             (oldValue, newValue) =>
-                            TextEditingValue(text: newValue.text.toUpperCase(), selection: newValue.selection),
+                            TextEditingValue(text: newValue.text.toUpperCase(),
+                                selection: newValue.selection),
                       ),
                     ],
                     decoration: const InputDecoration(
@@ -538,10 +600,10 @@ class _FastagFormState extends State<FastagForm> {
                       });
                     },
                     inputFormatters: [
-                      // Ensures all entered text is in uppercase
                       TextInputFormatter.withFunction(
                             (oldValue, newValue) =>
-                            TextEditingValue(text: newValue.text.toUpperCase(), selection: newValue.selection),
+                            TextEditingValue(text: newValue.text.toUpperCase(),
+                                selection: newValue.selection),
                       ),
                     ],
                     decoration: const InputDecoration(
@@ -588,7 +650,8 @@ class _FastagFormState extends State<FastagForm> {
                           Text(
                             _requestDate == null
                                 ? 'Select request date'
-                                : DateFormat('dd-MM-yyyy').format(_requestDate!),
+                                : DateFormat('dd-MM-yyyy').format(
+                                _requestDate!),
                           ),
                           const Icon(Icons.calendar_today),
                         ],

@@ -3,7 +3,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'welcome_page.dart'; // Update this import based on the file's location
 import 'package:upgrader/upgrader.dart';
 
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Upgrader.clearSavedSettings();
@@ -239,10 +238,10 @@ class AboutUsPage extends StatelessWidget {
         child: SingleChildScrollView(
           child: const Text(
             'WORLD RENEWAL SPIRITUAL TRUST (WRST) is a Non-Governmental Organization (NGO) / Voluntary Organization (VO) / Non Profit Organisation (NPO). '
-                'A non-profit organization that operates independently of any government, typically one whose purpose is to address a social or political issue.\n\n'
-                'Registered as a charitable trust, with its Head-Office in Mumbai, the WRST was incorporated in December 1968 with our main services including arrangement and management of museums, '
-                'exhibitions and seminars with special emphasis on imparting knowledge, ennobling character & uplifting human lives. For this purpose, the WRST makes provisions for the study and teaching as '
-                'also establishing and managing institutes for the said purpose.',
+            'A non-profit organization that operates independently of any government, typically one whose purpose is to address a social or political issue.\n\n'
+            'Registered as a charitable trust, with its Head-Office in Mumbai, the WRST was incorporated in December 1968 with our main services including arrangement and management of museums, '
+            'exhibitions and seminars with special emphasis on imparting knowledge, ennobling character & uplifting human lives. For this purpose, the WRST makes provisions for the study and teaching as '
+            'also establishing and managing institutes for the said purpose.',
             textAlign: TextAlign.justify,
           ),
         ),
@@ -252,7 +251,6 @@ class AboutUsPage extends StatelessWidget {
 }
 
 // Privacy Policy Page
-
 
 class PrivacyPolicyPage extends StatelessWidget {
   const PrivacyPolicyPage({super.key});
@@ -295,7 +293,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                 SizedBox(height: 10), // Spacing between sections
                 Text(
                   'At https://bkaccanmol.bkapp.org/ Fastag App, we are committed to protecting the privacy of our users. This Privacy Policy outlines how we collect, '
-                      'use, and safeguard your personal information when you use our mobile application.\n',
+                  'use, and safeguard your personal information when you use our mobile application.\n',
                   textAlign: TextAlign.justify,
                   style: TextStyle(fontSize: 16),
                 ),
@@ -324,7 +322,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                 SizedBox(height: 5),
                 Text(
                   'The information we collect is used for providing and improving our services, ensuring secure access, and responding to your inquiries. '
-                      'We may also use your information to send notifications or manage your requests.\n',
+                  'We may also use your information to send notifications or manage your requests.\n',
                   textAlign: TextAlign.justify,
                   style: TextStyle(fontSize: 16),
                 ),
@@ -353,7 +351,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                 SizedBox(height: 5),
                 Text(
                   'We do not knowingly collect personal information from children under 13. If we become aware that we have collected such information, '
-                      'we will take immediate steps to delete it.\n',
+                  'we will take immediate steps to delete it.\n',
                   textAlign: TextAlign.justify,
                   style: TextStyle(fontSize: 16),
                 ),
@@ -393,6 +391,3 @@ class PrivacyPolicyPage extends StatelessWidget {
     );
   }
 }
-
-
-
