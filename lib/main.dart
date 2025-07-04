@@ -120,7 +120,7 @@ class _LoginPageState extends State<LoginPage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),
-                color: Colors.cyanAccent.withOpacity(0.6),
+                color: Colors.cyanAccent,
                 margin: const EdgeInsets.symmetric(horizontal: 20),
                 child: Padding(
                   padding: const EdgeInsets.all(20),
@@ -271,7 +271,7 @@ class PrivacyPolicyPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(10.0),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.3),
+                  color: Colors.grey,
                   spreadRadius: 3,
                   blurRadius: 5,
                   offset: const Offset(0, 3), // Position of shadow

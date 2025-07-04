@@ -150,7 +150,7 @@ class _FastagFormState extends State<FastagForm> {
       if (vehicleData['VehicleFullNumber'] != '') { // Vehicle exists
         if (vehicleData['Expiration'] == 'NO') {
           _showSnackbar(
-              'Error: Request already exists for this vehicle number');
+              'Error: Request already exists for this vehicle number  Please try after 3 days Again');
           return;
         }
       }
@@ -332,7 +332,7 @@ class _FastagFormState extends State<FastagForm> {
       List<dynamic> allRecords = json.decode(response.body);
 
       // Find the record matching the vehicle number
-      var record = allRecords.firstWhere(
+      var record = allRecords.lastWhere(
               (element) =>
           element['VehicleFullNumber']
               ?.toString()
